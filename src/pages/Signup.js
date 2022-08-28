@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSignupUserMutation } from "../services/appApi";
 import "./Signup.css";
 import botImg from "../assets/bot.jpeg";
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // signup
+
+  const [signupUser, { isLoading, error }] = useSignupUserMutation();
+
+  const navigate = useNavigate();
 
   // image set state
   // default no image
@@ -46,10 +52,16 @@ const Signup = () => {
   }
   async function handleSignup(e) {
     e.preventDefault();
-    if (!image) alert("Please upload your profile picture");
+    if (!image) return alert("Please upload your profile picture");
     const url = await uploadImage(image);
     console.log(url);
     // signup the User
+    signupUser({ name, email, password, picture: url }).then(({ data }) => {
+      if (data) {
+        console.log(data);
+        navigate("/chat");
+      }
+    });
   }
   return (
     <Container>
